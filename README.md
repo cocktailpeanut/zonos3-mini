@@ -8,7 +8,7 @@ A local launcher for [Zyphra's ZONOS3-Mini](https://github.com/Zyphra/ZONOS3-Min
 
 Use the [one-click Pinokio install link](https://pinokio.co/resolve?url=https://github.com/cocktailpeanut/zonos3-mini) to add this launcher. Open the link and add the project if prompted, signing in if needed. You can also enter `https://github.com/cocktailpeanut/zonos3-mini` in Pinokio's **Download from URL** dialog.
 
-1. Open this launcher in Pinokio and click **Install**. It clones the upstream project into `app/`, installs the selected backend, and downloads approximately **6.7 GB** of public model files. No Hugging Face token is required.
+1. Open this launcher in Pinokio and click **Install**. It clones the upstream project into `app/`, installs the selected backend, and downloads approximately **6.7 GB** of public model files. No Hugging Face token is required. Installation stops if any of the six required model files is missing or empty.
 2. Click **Start**. Once the model is loaded, **Open Web UI** opens the local server. Choose **Zonos Voice Studio** or **Lite**, select a supplied voice or upload a reference recording, enter text, and generate speech.
 3. Use Pinokio's native stop control to stop the server.
 
@@ -50,7 +50,16 @@ Tested on a Windows x64 Shadow PC with an NVIDIA RTX A4500 and CUDA 12.8 on Nove
 - Generated a non-silent 2.07-second speech WAV and a non-silent 3.93-second WAV from an uploaded MP3 reference. Both were mono, 16-bit, 44.1 kHz audio. FFmpeg came from Pinokio.
 - Verified the corrected dependency command and fresh CMake configuration through Pinokio on Windows. A duplicate verification rebuild was stopped after configuration; the runtime tests used the completed native build.
 
-Linux and Intel Mac runtime execution, raw-reference mode, and destructive reset remain untested.
+Tested on Dot cloud with Debian 13.6, x86-64, and no exposed GPU on November 12, 2026, using launcher commit `c6a9712` and upstream commit `4c66cea`:
+
+- Built the native CPU server once through Pinokio and downloaded all six model files (6,744,413,120 bytes). The published `start.js` captured the server URL, and Pinokio reported it online and ready.
+- Health, chooser, Studio, Lite, speakers, capabilities, controls, and models returned HTTP 200. An unknown voice returned HTTP 400.
+- Generated a non-silent 2.40-second speech WAV and a non-silent 3.93-second WAV from a public MP3 reference in embedding mode. Both were mono, 16-bit, 44.1 kHz audio.
+- This required a sandbox-specific loopback fallback in the isolated Pinokiod 8.1.1 runtime because the cloud sandbox denies network-interface enumeration. Installation resumed at the published download steps after installing the proxy client's `socksio` dependency and configuring the platform-provided CA certificate. TLS verification remained enabled. No launcher edits or manual upstream source edits were needed for execution. This verifies execution through the adapted runtime; an uninterrupted install with unmodified Pinokiod was not verified in this sandbox.
+
+Verified the model-download guard separately through Pinokio on macOS, Windows, and the adapted Linux cloud runtime. Existing models allowed the following completion marker; an empty model directory, a missing `steer.gguf`, and an empty `zac-keep2.gguf` each stopped execution before that marker. These checks reused the completed builds and did not repeat installation or speech tests.
+
+Linux CUDA and ARM64 execution, Intel Mac runtime execution, raw-reference mode, and destructive reset remain untested.
 
 ## HTTP API
 

@@ -70,6 +70,16 @@ module.exports = (kernel) => ({
       "local-dir": "servers/ggml"
     }
   }, {
+    method: "shell.run",
+    params: {
+      path: "app",
+      message: "\"{{which('node')}}\" -e \"const fs = require('fs'); const missing = 'backbone-ptq zac-keep2 spk-encoder zac-encoder ssl-teacher steer'.split(' ').filter(name => { try { const file = fs.statSync('servers/ggml/gguf/' + name + '.gguf'); return file.isFile() === false || file.size === 0 } catch { return true } }); if (missing.length) { console.error('Model download ' + 'incomplete: ' + missing.join(', ') + '. Check the download error and run Install again.'); process.exit(1) }\"",
+      on: [{
+        event: "/Model download incomplete:/",
+        break: true
+      }]
+    }
+  }, {
     method: "fs.write",
     params: {
       path: "app/.installed",
