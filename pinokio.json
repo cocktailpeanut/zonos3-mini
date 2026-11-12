@@ -1,0 +1,14 @@
+{
+  "title": "ZONOS3-Mini",
+  "description": "Local multilingual speech generation, voice cloning, and voice steering with Zonos Voice Studio. https://github.com/Zyphra/ZONOS3-Mini",
+  "icon": "icon.png",
+  "platform": ["darwin", "win32", "linux"],
+  "arch": ["arm64", "x64"],
+  "links": [{
+    "title": "Source",
+    "value": "https://github.com/Zyphra/ZONOS3-Mini"
+  }, {
+    "title": "Models",
+    "value": "https://huggingface.co/Zyphra/ZONOS3-Mini"
+  }]
+}
