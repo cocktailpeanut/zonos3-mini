@@ -27,7 +27,7 @@ The server binds to `127.0.0.1` and uses an available port chosen by Pinokio. Re
 | Windows or Linux with NVIDIA | Native ggml, CUDA |
 | Other Windows or Linux machines | Native ggml, CPU |
 
-Pinokio's AI bundle supplies FFmpeg, the Linux C/C++ compiler, and Windows Visual Studio build tools. Native builds add only CMake 3.24+, Ninja, and Rust 1.88+ to Pinokio's shared Conda environment and use that same environment when building and starting the server. NVIDIA builds require a supported CUDA-capable card and driver; CMake targets the detected local GPU. Other GPU vendors use the CPU backend. Native macOS builds require Apple's command-line development tools. Shared Pinokio tools remain installed after resetting this app.
+Pinokio's AI bundle supplies FFmpeg, the Linux C/C++ compiler, and Windows Visual Studio build tools. Native builds add CMake 3.24+, Ninja, and Rust 1.88+ to Pinokio's shared Conda environment and use that same environment when building and starting the server. Windows also installs Clang and its OpenMP runtime for C/C++ compilation because the bundled Visual Studio 2019 compiler rejects an upstream struct declaration; Visual Studio still supplies the Windows SDK, linker, and CUDA host compiler. NVIDIA builds require a supported CUDA-capable card and driver; CMake targets the detected local GPU. Other GPU vendors use the CPU backend. Native macOS builds require Apple's command-line development tools. Shared Pinokio tools remain installed after resetting this app.
 
 Allow additional disk space for dependencies and build files. Performance and memory requirements depend on the machine and reference clip. Windows x64 is the intended Windows configuration.
 
@@ -42,6 +42,15 @@ Tested on Apple Silicon macOS with upstream commit `4c66cea` on November 11, 202
 - Generated a 4.4-second speech WAV and a 3.53-second WAV using an uploaded reference clip in embedding mode; both were non-silent, mono, 16-bit, 44.1 kHz audio.
 - Built the native `zonos3-server` with Metal on Apple Silicon using only the additional CMake, Ninja, and Rust packages in Pinokio's shared environment. Verified startup and generated a 2.4-second speech WAV and a 4.47-second WAV from an uploaded MP3 reference using the shared FFmpeg.
 - Checked JavaScript syntax, menu lifecycle states, the unpublished-launcher update condition, and command rendering through Pinokio's actual template engine for macOS ARM64/x64, Linux ARM64/x64, and Windows x64. CUDA, Windows/Linux/Intel Mac execution, raw-reference mode, and destructive reset were not exercised on this machine.
+
+Tested on a Windows x64 Shadow PC with an NVIDIA RTX A4500 and CUDA 12.8 on November 12, 2026:
+
+- Built the native CUDA server with Clang and Conda's LLVM OpenMP runtime, then launched it through Pinokio's shared environment. Pinokio captured the URL and reported the server online.
+- Health, chooser, Studio, Lite, capabilities, controls, models, and 30 default voices responded successfully. An unknown voice returned HTTP 400.
+- Generated a non-silent 2.07-second speech WAV and a non-silent 3.93-second WAV from an uploaded MP3 reference. Both were mono, 16-bit, 44.1 kHz audio. FFmpeg came from Pinokio.
+- Verified the corrected dependency command and fresh CMake configuration through Pinokio on Windows. A duplicate verification rebuild was stopped after configuration; the runtime tests used the completed native build.
+
+Linux and Intel Mac runtime execution, raw-reference mode, and destructive reset remain untested.
 
 ## HTTP API
 

@@ -1,4 +1,4 @@
-module.exports = {
+module.exports = (kernel) => ({
   requires: {
     bundle: "ai"
   },
@@ -37,7 +37,7 @@ module.exports = {
     method: "shell.run",
     params: {
       path: "app",
-      message: "conda install -y -c conda-forge \"cmake>=3.24\" ninja \"rust>=1.88\""
+      message: "conda install -y -c conda-forge \"cmake>=3.24\" ninja \"rust>=1.88\" {{platform === 'win32' ? 'clang llvm-openmp' : ''}}"
     }
   }, {
     when: "{{!(platform === 'darwin' && arch === 'arm64')}}",
@@ -46,9 +46,13 @@ module.exports = {
       path: "app",
       build: true,
       message: [
-        "cmake --fresh -S servers/ggml -B servers/ggml/build -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF -DBUILD_SHARED_LIBS=OFF {{gpu === 'nvidia' ? '-DGGML_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES=native' : '-DGGML_CUDA=OFF'}}",
+        `cmake --fresh -S servers/ggml -B servers/ggml/build -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF -DBUILD_SHARED_LIBS=OFF ${kernel.platform === "win32" ? `-DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl "-DOpenMP_libomp_LIBRARY=${kernel.bin.path("miniforge/Library/lib/libiomp5md.lib")}"` : ""} {{gpu === 'nvidia' ? '-DGGML_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES=native' : '-DGGML_CUDA=OFF'}}`,
         "cmake --build servers/ggml/build --config Release --target zonos3-server --parallel 4"
-      ]
+      ],
+      on: [{
+        event: "/CMake Error|FAILED:|ninja: build stopped/i",
+        break: true
+      }]
     }
   }, {
     method: "hf.download",
@@ -72,4 +76,4 @@ module.exports = {
       text: "Installation completed.\n"
     }
   }]
-}
+})
