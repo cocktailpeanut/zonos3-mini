@@ -27,9 +27,9 @@ The server binds to `127.0.0.1` and uses an available port chosen by Pinokio. Re
 | Windows or Linux with NVIDIA | Native ggml, CUDA |
 | Other Windows or Linux machines | Native ggml, CPU |
 
-Pinokio's AI bundle supplies the shared prerequisites. Native builds install CMake, Ninja, Rust, pkg-config, and FFmpeg into an app-local Conda environment; Linux also installs its C/C++ compiler packages. Windows builds use Pinokio's Visual Studio build environment. NVIDIA builds require a supported CUDA-capable card and driver; CMake targets the detected local GPU. Other GPU vendors use the CPU backend. Native macOS builds require Apple's command-line development tools.
+Pinokio's AI bundle supplies FFmpeg, the Linux C/C++ compiler, and Windows Visual Studio build tools. Native builds add only CMake 3.24+, Ninja, and Rust 1.88+ to Pinokio's shared Conda environment and use that same environment when building and starting the server. NVIDIA builds require a supported CUDA-capable card and driver; CMake targets the detected local GPU. Other GPU vendors use the CPU backend. Native macOS builds require Apple's command-line development tools. Shared Pinokio tools remain installed after resetting this app.
 
-Allow additional disk space for dependencies and build files. Performance and memory requirements depend on the machine and reference clip. The native Windows/Linux paths require a matching Conda toolchain; Windows x64 is the intended Windows configuration.
+Allow additional disk space for dependencies and build files. Performance and memory requirements depend on the machine and reference clip. Windows x64 is the intended Windows configuration.
 
 The standard install includes the quantized release backbone, compact decoder, speaker encoder, raw-reference encoder, SSL teacher, steering bundle, and upstream default voices. It preserves upstream code and model-format validation. Upstream's optional full decoder, speech-edit model/adapters, ASR environment, pronunciation lexicon, and dubbing plugins are not installed. See the [upstream documentation](https://github.com/Zyphra/ZONOS3-Mini#optional-features) for those additional setups.
 
@@ -40,7 +40,8 @@ Tested on Apple Silicon macOS with upstream commit `4c66cea` on November 11, 202
 - Installed from an empty `app/` through `pterm start install.js`, then launched through `pterm run`. Pinokio reported the server online and captured its available-port URL.
 - Health, chooser, Studio, Lite, capabilities, controls, model listing, and 30 default voices returned HTTP 200. An unknown voice ID returned HTTP 400.
 - Generated a 4.4-second speech WAV and a 3.53-second WAV using an uploaded reference clip in embedding mode; both were non-silent, mono, 16-bit, 44.1 kHz audio.
-- Checked JavaScript syntax, menu lifecycle states, the unpublished-launcher update condition, and generated commands for macOS ARM64/x64, Linux ARM64/x64, and Windows x64. Native compilation, CUDA, Windows/Linux/Intel Mac execution, raw-reference mode, and destructive reset were not exercised on this machine.
+- Built the native `zonos3-server` with Metal on Apple Silicon using only the additional CMake, Ninja, and Rust packages in Pinokio's shared environment. Verified startup and generated a 2.4-second speech WAV and a 4.47-second WAV from an uploaded MP3 reference using the shared FFmpeg.
+- Checked JavaScript syntax, menu lifecycle states, the unpublished-launcher update condition, and command rendering through Pinokio's actual template engine for macOS ARM64/x64, Linux ARM64/x64, and Windows x64. CUDA, Windows/Linux/Intel Mac execution, raw-reference mode, and destructive reset were not exercised on this machine.
 
 ## HTTP API
 

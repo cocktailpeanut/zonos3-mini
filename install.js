@@ -37,18 +37,16 @@ module.exports = {
     method: "shell.run",
     params: {
       path: "app",
-      conda: "build-env",
-      message: "conda install -y -c conda-forge cmake ninja rust pkg-config ffmpeg {{platform === 'linux' ? 'c-compiler cxx-compiler' : ''}}"
+      message: "conda install -y -c conda-forge \"cmake>=3.24\" ninja \"rust>=1.88\""
     }
   }, {
     when: "{{!(platform === 'darwin' && arch === 'arm64')}}",
     method: "shell.run",
     params: {
       path: "app",
-      conda: "build-env",
       build: true,
       message: [
-        "cmake -S servers/ggml -B servers/ggml/build -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF -DBUILD_SHARED_LIBS=OFF {{gpu === 'nvidia' ? '-DGGML_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES=native' : '-DGGML_CUDA=OFF'}}",
+        "cmake --fresh -S servers/ggml -B servers/ggml/build -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF -DBUILD_SHARED_LIBS=OFF {{gpu === 'nvidia' ? '-DGGML_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES=native' : '-DGGML_CUDA=OFF'}}",
         "cmake --build servers/ggml/build --config Release --target zonos3-server --parallel 4"
       ]
     }
